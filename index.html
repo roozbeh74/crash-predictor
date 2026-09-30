@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پیش‌بینی ضریب هوش مصنوعی</title>
+    <!-- اضافه کردن کتابخانه Brain.js برای هوش مصنوعی در مرورگر -->
+    <script src="https://unpkg.com/brain.js"></script>
+    <style>
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            background-color: #1e1e2f;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #2a2a40;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            text-align: center;
+            width: 350px;
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 15px 0;
+            border: none;
+            border-radius: 5px;
+            text-align: left;
+            direction: ltr;
+        }
+        button {
+            background-color: #00d2ff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #3a7bd5;
+            color: #fff;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #00fa9a;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>هوش مصنوعی پیش‌بینی Crash</h2>
+        <p>ضریب‌های قبلی را با کاما وارد کنید:</p>
+        <!-- کاربر داده‌های قبلی را اینجا وارد می‌کند -->
+        <input type="text" id="history" placeholder="مثال: 1.20, 2.50, 1.10, 4.00, 1.80">
+        <button onclick="predictNext()">شروع پیش‌بینی</button>
+        
+        <div id="result">نتیجه اینجا نمایش داده می‌شود...</div>
+    </div>
+
+    <script>
+        // این تابع با کلیک روی دکمه اجرا می‌شود
+        function predictNext() {
+            const inputField = document.getElementById('history').value;
+            const resultDiv = document.getElementById('result');
+            
+            // تبدیل رشته متنی کاربر به آرایه‌ای از اعداد اعشاری (Float)
+            const dataArray = inputField.split(',').map(item => parseFloat(item.trim()));
+
+            // بررسی اینکه آیا داده‌ها به درستی وارد شده‌اند یا خیر
+            if(dataArray.some(isNaN) || dataArray.length < 3) {
+                resultDiv.innerHTML = "لطفاً حداقل ۳ ضریب معتبر وارد کنید.";
+                resultDiv.style.color = "#ff4c4c";
+                return;
+            }
+
+            resultDiv.innerHTML = "در حال آموزش شبکه عصبی... لطفاً صبر کنید.";
+            resultDiv.style.color = "#f0ad4e";
+
+            // استفاده از تایم‌اوت برای جلوگیری از قفل شدن مرورگر در حین پردازش
+            setTimeout(() => {
+                try {
+                    // ساخت یک شبکه عصبی از نوع LSTM (مناسب برای پیش‌بینی اعداد متوالی)
+                    const net = new brain.recurrent.LSTMTimeStep({
+                        inputSize: 1,
+                        hiddenLayers: [10],
+                        outputSize: 1
+                    });
+
+                    // آموزش هوش مصنوعی با داده‌های وارد شده
+                    // ما یک آرایه از اعداد به آن می‌دهیم تا الگو را درک کند
+                    net.train([dataArray], {
+                        iterations: 1500, // تعداد دفعات مرور داده‌ها برای یادگیری
+                        errorThresh: 0.05, // آستانه خطا
+                        log: false
+                    });
+
+                    // اجرای پیش‌بینی بر اساس داده‌های فعلی
+                    const forecast = net.run(dataArray);
+                    
+                    // نمایش نتیجه و گرد کردن عدد به دو رقم اعشار
+                    resultDiv.innerHTML = `پیش‌بینی ضریب بعدی: ${forecast.toFixed(2)}x`;
+                    resultDiv.style.color = "#00fa9a";
+
+                } catch (error) {
+                    resultDiv.innerHTML = "خطایی در پردازش رخ داد. لطفاً اعداد را بررسی کنید.";
+                    console.error(error);
+                }
+            }, 100);
+        }
+    </script>
+</body>
+</html>
