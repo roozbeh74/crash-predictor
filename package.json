@@ -1,0 +1,24 @@
+{
+  "name": "crash-predictor",
+  "version": "1.0.0",
+  "description": "Crash game predictor with AI pattern analysis - پیش‌بینی بازی کراش با هوش مصنوعی",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "brain.js": "^2.0.0-beta.24",
+    "chart.js": "^4.4.1",
+    "date-fns": "^3.3.1"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.1.0",
+    "vite": "^5.1.0"
+  },
+  "keywords": ["crash", "predictor", "faucetpay", "ai", "gambling", "pattern", "analysis"],
+  "author": "",
+  "license": "MIT"
+}
